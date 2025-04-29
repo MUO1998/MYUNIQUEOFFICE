@@ -112,7 +112,7 @@ export default function HomePage() {
                 <Button
                   className="mt-4 w-full"
                   onClick={() => {
-                    window.location.href = `https://your-store.myshopify.com/products/${node.handle}`;
+                    window.location.href = `https://myuniqueoffice.myshopify.com/products/${node.handle}`;
                   }}
                 >
                   View Details
