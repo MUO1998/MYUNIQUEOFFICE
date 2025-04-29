@@ -1,0 +1,150 @@
+import React, { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+
+const SHOPIFY_STOREFRONT_API_URL = "https://your-store.myshopify.com/api/2023-01/graphql.json";
+const SHOPIFY_STOREFRONT_ACCESS_TOKEN = process.env.NEXT_PUBLIC_SHOPIFY_TOKEN;
+
+export default function HomePage() {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    async function fetchProducts() {
+      const query = `
+        {
+          products(first: 6) {
+            edges {
+              node {
+                id
+                title
+                handle
+                description
+                images(first: 1) {
+                  edges {
+                    node {
+                      url
+                      altText
+                    }
+                  }
+                }
+                variants(first: 1) {
+                  edges {
+                    node {
+                      id
+                      price {
+                        amount
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      `;
+
+      const response = await fetch(SHOPIFY_STOREFRONT_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Shopify-Storefront-Access-Token": SHOPIFY_STOREFRONT_ACCESS_TOKEN,
+        },
+        body: JSON.stringify({ query }),
+      });
+
+      const json = await response.json();
+      setProducts(json.data.products.edges);
+    }
+
+    fetchProducts();
+  }, []);
+
+  return (
+    <div className="space-y-12 p-6 md:p-12">
+      {/* Hero Section */}
+      <section className="text-center space-y-4">
+        <h1 className="text-4xl md:text-6xl font-bold">Design Your Workspace</h1>
+        <p className="text-lg md:text-xl max-w-2xl mx-auto">
+          Discover high-end European office furniture customizable to your style.
+        </p>
+        <Button className="text-lg px-6 py-3">Explore Our Collections</Button>
+      </section>
+
+      {/* Features Section */}
+      <section className="grid md:grid-cols-3 gap-6 text-center">
+        <Card>
+          <CardContent className="p-4">
+            <h2 className="text-xl font-semibold">Crafted in the EU</h2>
+            <p>Premium quality and modern design from Europe’s top manufacturers.</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <h2 className="text-xl font-semibold">Modular & Ergonomic</h2>
+            <p>Designed for both comfort and flexibility in your work environment.</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <h2 className="text-xl font-semibold">Exclusive in the U.S.</h2>
+            <p>Imported and available only through our Dallas-based platform.</p>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Product Showcase */}
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold text-center">Featured Products</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          {products.map(({ node }) => (
+            <Card key={node.id} className="overflow-hidden">
+              <img
+                src={node.images.edges[0]?.node.url || "/images/placeholder.jpg"}
+                alt={node.images.edges[0]?.node.altText || node.title}
+                className="w-full h-64 object-cover"
+              />
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-xl">{node.title}</h3>
+                <p className="text-gray-600">{node.description}</p>
+                <p className="font-bold mt-2">
+                  From ${node.variants.edges[0].node.price.amount}
+                </p>
+                <Button
+                  className="mt-4 w-full"
+                  onClick={() => {
+                    window.location.href = `https://your-store.myshopify.com/products/${node.handle}`;
+                  }}
+                >
+                  View Details
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <section className="text-center space-y-4">
+        <h2 className="text-2xl md:text-3xl font-bold">Bring European Elegance to Your Office</h2>
+        <p>Contact us for custom orders, design help, or bulk commercial quotes.</p>
+        <Button className="text-lg px-6 py-3">Get In Touch</Button>
+      </section>
+
+      {/* Contact Form */}
+      <section className="max-w-xl mx-auto space-y-4">
+        <h3 className="text-xl font-semibold">Contact Us</h3>
+        <form className="space-y-4">
+          <input type="text" placeholder="Name" className="w-full border p-2 rounded" />
+          <input type="email" placeholder="Email" className="w-full border p-2 rounded" />
+          <textarea placeholder="Message" className="w-full border p-2 rounded" rows={4}></textarea>
+          <Button className="w-full">Send Message</Button>
+        </form>
+      </section>
+
+      {/* Footer */}
+      <footer className="text-center text-gray-500 text-sm pt-8">
+        © {new Date().getFullYear()} My Unique Office. All rights reserved.
+      </footer>
+    </div>
+  );
+}
