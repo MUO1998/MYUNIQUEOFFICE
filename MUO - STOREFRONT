@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-const SHOPIFY_STOREFRONT_API_URL = "https://your-store.myshopify.com/api/2023-01/graphql.json";
+const myuniqueoffice.myshopify.com = "https://your-store.myshopify.com/api/2023-01/graphql.json";
 const SHOPIFY_STOREFRONT_ACCESS_TOKEN = process.env.NEXT_PUBLIC_SHOPIFY_TOKEN;
 
 export default function HomePage() {
